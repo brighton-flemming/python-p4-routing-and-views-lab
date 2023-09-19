@@ -8,8 +8,8 @@ app = Flask(__name__)
 def index():
     return "<h1>Python Operations with Flask Routing and Views</h1>"
 
-@app.route('/print_string/<string:string>')
-def print_string(string):
+@app.route('/print/<string:string>')
+def print(string):
     return f"{string}"
 
 @app.route('/count/<int:number>')
@@ -31,6 +31,11 @@ def math(num1, operation, num2):
         result = num1 - num2
     elif operation == "*":
         result = num1 * num2
+    elif operation == "div":
+         if num2 != 0:
+            result = num1 / num2
+         else:
+            return "Division by zero is mathematically impossible.You should know that."
     elif operation == "%":
         if num2 != 0:
             result = num1 % num2
