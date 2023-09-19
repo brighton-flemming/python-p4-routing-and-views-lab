@@ -10,7 +10,11 @@ def index():
 
 @app.route('/<string:string>')
 def print_string(string):
-    print f"{string}"
+    return f"{string}"
+
+@app.route('<integer:number>')
+def count(number):
+    pass
 
 
 if __name__ == '__main__':
