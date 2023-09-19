@@ -8,18 +8,24 @@ app = Flask(__name__)
 def index():
     return "<h1>Python Operations with Flask Routing and Views</h1>"
 
-@app.route('/<string:string>')
+@app.route('/print_string/<string:string>')
 def print_string(string):
     return f"{string}"
 
-@app.route('/<integer:number>')
+@app.route('/count/<int:number>')
 def count(number):
     if number <= 0:
         print ("Kindly don't be stupid. We need a positive number.")
         return
     
-    for int in range(1, number + 1):
-        print(int)
+    numbers = [str(int) for int in range(1, number + 1)]
+    return "\n".join(numbers)
+
+@app.route('/math/<num1>/<operation>/<num2>')
+def math(num1, operation, num2):
+    operation = ["+", "-", "*", "%" ]
+
+
 
 
 if __name__ == '__main__':
