@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask
+from flask import Flask,abort
 
 app = Flask(__name__)
 
@@ -14,16 +14,16 @@ def print(string):
 
 @app.route('/count/<int:number>')
 def count(number):
-    if number <= 0:
-        print ("Kindly don't be stupid. We need a positive number.")
-        return
-    
-    numbers = [str(int) for int in range(1, number + 1)]
-    return "\n".join(numbers)
+    if number > 0:
+     numbers = [str(int) for int in range(1, number + 1)]
+     return "\n".join(numbers)
+    else:
+         abort("Kindly don't be stupid. We need a positive number.", 400)
+
 
 @app.route('/math/<float:num1>/<string:operation>/<float:num2>')
 def math(num1, operation, num2):
-    result=None
+    result = None
 
     if operation in ("+", "add") :
         result = num1 + num2
@@ -35,7 +35,7 @@ def math(num1, operation, num2):
          if num2 != 0:
             result = num1 / num2
          else:
-            return "Division by zero is mathematically impossible.You should know that."
+            abort(400, "Division by zero is mathematically impossible.You should know that.")
     elif operation == "%":
         if num2 != 0:
             result = num1 % num2

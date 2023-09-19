@@ -1,76 +1,65 @@
-import io
-import sys
 
+
+import unittest
+from flask import Flask
 from app import app
 
-class TestApp:
-    '''Flask application in flask_app.py'''
+class TestApp(unittest.TestCase):
 
-    def test_index_route(self):
-        '''has a resource available at "/".'''
-        response = app.test_client().get('/')
-        assert(response.status_code == 200)
+    def setUp(self):
+        # Create a test client
+        self.app = app.test_client()
+        self.app.testing = True
 
-    def test_index_text(self):
-        '''displays "Python Operations with Flask Routing and Views" in h1 in browser.'''
-        response = app.test_client().get('/')
-        assert(response.data.decode() == '<h1>Python Operations with Flask Routing and Views</h1>')
+    def test_index(self):
+        response = self.app.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Python Operations with Flask Routing and Views", response.data)
 
-    def test_print_route(self):
-        '''has a resource available at "/print/<parameter>".'''
-        response = app.test_client().get('/print/hello')
-        assert(response.status_code == 200)
+    def test_print(self):
+        response = self.app.get('/print/Hello')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b"Hello")
 
-    def test_print_text(self):
-        '''displays text of route in browser.'''
-        response = app.test_client().get('/print/hello')
-        assert(response.data.decode() == 'hello')
+    def test_count(self):
+        response = self.app.get('/count/5')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b"1\n2\n3\n4\n5")
 
-    def test_print_text_in_console(self):
-        '''displays text of route in console.'''
-        captured_out = io.StringIO()
-        sys.stdout = captured_out
-        app.test_client().get('/print/hello')
-        sys.stdout = sys.__stdout__
-        assert(captured_out.getvalue() == 'hello\n')
-
-    def test_count_route(self):
-        '''has a resource available at "/count/<parameter>".'''
-        response = app.test_client().get('/count/5')
-        assert(response.status_code == 200)
-
-    def test_count_range_10(self):
-        '''counts through range of parameter in "/count/<parameter" on separate lines.'''
-        response = app.test_client().get('/count/10')
-        count = '0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n'
-        assert(response.data.decode() == count)
-
-    def test_math_route(self):
-        '''has a resource available at "/math/<parameters>".'''
-        response = app.test_client().get('/math/5/+/5')
-        assert(response.status_code == 200)
+    def test_count_negative(self):
+        response = self.app.get('/count/-5')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"Don't be stupid. We need a positive number.", response.data)
 
     def test_math_add(self):
-        '''adds parameters in "/math/" resource when operation is "+".'''
-        response = app.test_client().get('/math/5/+/5')
-        assert(response.data.decode() == '10')
+        response = self.app.get('/math/2.5/add/3.5')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b"The result of 2.5 add 3.5 is 6.0")
 
     def test_math_subtract(self):
-        '''subtracts parameters in "/math/" resource when operation is "-".'''
-        response = app.test_client().get('/math/5/-/5')
-        assert(response.data.decode() == '0')
+        response = self.app.get('/math/10.0/subtract/5.0')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b"The result of 10.0 subtract 5.0 is 5.0")
 
     def test_math_multiply(self):
-        '''multiplies parameters in "/math/" resource when operation is "*".'''
-        response = app.test_client().get('/math/5/*/5')
-        assert(response.data.decode() == '25')
+        response = self.app.get('/math/4.0/multiply/2.5')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b"The result of 4.0 multiply 2.5 is 10.0")
 
     def test_math_divide(self):
-        '''divides parameters in "/math/" resource when operation is "div".'''
-        response = app.test_client().get('/math/5/div/5')
-        assert(response.data.decode() == '1.0')
-    
-    def test_math_modulo(self):
-        '''finds remainder of parameters in "/math/" resource when operation is "%".'''
-        response = app.test_client().get('/math/5/%/5')
-        assert(response.data.decode() == '0')
+        response = self.app.get('/math/10.0/divide/2.0')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b"The result of 10.0 divide 2.0 is 5.0")
+
+    def test_math_divide_by_zero(self):
+        response = self.app.get('/math/5.0/divide/0.0')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"Division by zero is mathematically impossible.", response.data)
+
+    def test_math_invalid_operation(self):
+        response = self.app.get('/math/5.0/unknown/2.0')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b"The operation is improbable.")
+
+if __name__ == '__main__':
+    unittest.main()
