@@ -12,9 +12,14 @@ def index():
 def print_string(string):
     return f"{string}"
 
-@app.route('<integer:number>')
+@app.route('/<integer:number>')
 def count(number):
-    pass
+    if number <= 0:
+        print ("Kindly don't be stupid. We need a positive number.")
+        return
+    
+    for int in range(1, number + 1):
+        print(int)
 
 
 if __name__ == '__main__':
