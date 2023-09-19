@@ -25,11 +25,11 @@ def count(number):
 def math(num1, operation, num2):
     result=None
 
-    if operation == "+" or "add":
+    if operation in ("+", "add") :
         result = num1 + num2
-    elif operation == "-" or "subtract":
+    elif operation in ("-", "subtract"):
         result = num1 - num2
-    elif operation == "*" or "multiply":
+    elif operation in ("*", "multiply") :
         result = num1 * num2
     elif operation == "divide":
          if num2 != 0:
